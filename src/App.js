@@ -6,9 +6,9 @@ function App() {
   const [repos, setRepos] = useState([]);
   const [commits, setCommits] = useState([]);
 
-  const fetchCommits = async () => {
+  const fetchCommits = async (repoName) => {
     try {
-      const response = await fetch("https://api.github.com/repos/bluesky/bluesky/stats/commit_activity", {
+      const response = await fetch(`https://api.github.com/repos/bluesky/${repoName}/stats/commit_activity`, {
         headers: {
           "X-GitHub-Api-Version" : "2022-11-28"
         }
@@ -37,8 +37,14 @@ function App() {
     //display the name for each repository
     return (
       <div>
-        {repos.map((item) => <li key={item.id}>{item.name}</li>)}
+        {repos.map((item) => <li onClick={()=> fetchCommits(item.name)}key={item.id}>{item.name}</li>)}
       </div>
+    )
+  }
+
+  const CommitList = () => {
+    return (
+      <p>{JSON.stringify(commits)}</p>
     )
   }
 
@@ -61,6 +67,7 @@ function App() {
       <button onClick={()=> fetchCommits()}>Fetch Commits</button>
       <button onClick={()=> fetchRepos()}>Fetch Repos</button>
       <RepositoryList />
+      <CommitList />
     </div>
   );
 }
