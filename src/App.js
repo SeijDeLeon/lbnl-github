@@ -14,7 +14,7 @@ function App() {
     //dashes and periods in names need to be removed or altered
     var cleanedName = name;
     if (cleanedName.includes('-')) {
-      cleanedName = cleanedName.replace('-', '_');
+      cleanedName = cleanedName.replace('-', '_'); //only changes first occurence, fix this
     }
     if (cleanedName.includes('.')) {
       cleanedName = cleanedName.replace('.', '_');
@@ -102,12 +102,10 @@ function App() {
 
 
   return (
-    <div className="">
+    <div className="h-screen py-8">
+      <Plot collection={sampleData} />
       <button >Fetch All Repos Commits</button>
       <button >Fetch All Repo Names</button>
-      <RepositoryList />
-      <CommitList />
-      <Plot collection={sampleData} />
     </div>
   );
 }
