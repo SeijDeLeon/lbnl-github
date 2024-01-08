@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Plot from './Plot.jsx';
 import mockData from './mockData.js';
 
@@ -20,7 +19,8 @@ function App() {
       cleanedName = cleanedName.replace('.', '_');
     }
     return cleanedName;
-  }
+  };
+
   const generateChartData = () => {
     var chartData = []; //used for data points in plot
     var repoNames = []; //used to map lines in plot, must match name field in chartData
@@ -38,7 +38,7 @@ function App() {
       chartData.push(singleDataPoint);                      //adds one week of data for all repos.
     }
     return {chartData: chartData, repoNames: repoNames};
-  }
+  };
 
   const sampleData = generateChartData();
 
@@ -52,7 +52,8 @@ function App() {
     for (let i = 0; i < 20; i++) {
       allRepoCommits.push(fetchSingleRepoCommits(repos[i].name));
     }
-    setCommitData(allRepoCommits);
+    setCommitData(allRepoCommits); //To Do: change logic to put this inside the async function
+    //After we fetch all the commit data and store in an array, we can call generateChartData to format it for plotting
   };
 
   const fetchSingleRepoCommits = async (repoName) => {
@@ -73,40 +74,43 @@ function App() {
 
 
   const fetchRepos = async () => {
-    //we know that the total number of repos is under 100, which is the limit for a single API call
-    //for orgs with more than 100 repos, we could optionally make multiple API calls for each page of repos
-    const response = await fetch("https://api.github.com/users/bluesky/repos?per_page=100", {
-      headers: {
-        "X-GitHub-Api-Version" : "2022-11-28"
-      }
-    });
-    const data = await response.json();
-    console.log(data);
-    setRepos(data);
+    try{
+      const response = await fetch("https://api.github.com/users/bluesky/repos?per_page=100", {
+        headers: {
+          "X-GitHub-Api-Version" : "2022-11-28"
+        }
+      });
+      const data = await response.json();
+      console.log(data);
+      setRepos(data);
+      //at this point, call fetchAllRepoCommits now that we have the repo names
+    } catch(error) {
+      console.log('Error in fetchRepos: ' + error);
+    }
   };
 
   const RepositoryList = () => {
     //display the name for each repository
     return (
-      <div>
-        {repos.map((item) => <li onClick={()=> fetchSingleRepoCommits(item.name)}key={item.id}>{item.name}</li>)}
+      <div className="flex w-8/12 my-8 m-auto flex-wrap">
+        {repos.map((item) => <p className="mx-4 my-2 border rounded-lg"key={item.id}>{item.name}</p>)}
       </div>
-    )
-  };
-
-  const CommitList = () => {
-    return (
-      <p>{JSON.stringify(commits)}</p>
     )
   };
 
 
   return (
-    <div className="h-screen py-8">
-      <Plot collection={sampleData} />
-      <button >Fetch All Repos Commits</button>
-      <button >Fetch All Repo Names</button>
-    </div>
+    <main>
+      <section className="h-screen py-12">
+        <Plot collection={sampleData} />
+      </section>
+      <section className="flex flex-col justify-center pb-8">
+        <div className="flex justify-center">
+          <button className="bg-slate-200 rounded-lg p-1 hover:bg-slate-300 mx-4" onClick={()=> fetchRepos()}>Fetch All Repo Names</button>
+        </div>
+        <RepositoryList />
+      </section>
+    </main>
   );
 }
 

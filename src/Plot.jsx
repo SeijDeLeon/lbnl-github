@@ -22,6 +22,7 @@ export default function Plot({collection}){
   }
 
   const toggleRepoDisplay = (repo) => {
+    //TO DO - figure out why changes to dataKeys are not reflected in the plot from this function
     var temp = dataKeys;
     if (dataKeys.includes(repo)) {
       const index = temp.indexOf(repo);
@@ -29,13 +30,10 @@ export default function Plot({collection}){
     } else {
       temp.push(repo);
     }
-    console.log(temp);
     setDataKeys(temp);
-    console.log(dataKeys);
   }
 
   const Lines = () => {
-
     const lines = dataKeys.map((name) => (
       <Line key={name} type="monotone" dataKey={name} stroke="#8884d8" />
     ))
@@ -46,14 +44,16 @@ export default function Plot({collection}){
     <div className="flex justify-center h-full">
       <div className="md:w-6/12 w-3/12">
         <div className="sticky top-0 m-auto flex flex-col items-center ">
-          <LineChart width={800} height={500} data={data}>
+          <LineChart width={800} height={500} data={data} margin={{top: 20, bottom: 20, left:20, right:20}}>
             {Lines()}
             <CartesianGrid stroke="#ccc" />
             <XAxis dataKey="week">
-              <Label value="Weeks" offset={0} position="insideBottom" />
+              <Label value="Weeks from Previous Year" offset={-10} position="insideBottom" />
             </XAxis>
-            <YAxis />
-            <Legend />
+            <YAxis>
+              <Label value="Weekly Commits" position="left" angle="-90" />
+            </YAxis>
+            <Legend verticalAlign="top"/>
           </LineChart>
           <h2 className="text-center text-2xl text-sky-700 font-medium py-8">Bluesky Repository Commit History</h2>
           <p>Select a repository to display the weekly commit history for the previous year.</p>
@@ -63,8 +63,3 @@ export default function Plot({collection}){
     </div>
   );
 }
-
-/*
-<Line type="monotone" dataKey="bluesky" stroke="#8884d8" />
-<Line type="monotone" dataKey="tiled" stroke="#cf3227" />
-<Line type="monotone" dataKey="TiledClient_jl" stroke="#465227" /> */
