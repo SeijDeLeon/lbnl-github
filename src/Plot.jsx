@@ -1,18 +1,36 @@
 import { LineChart, Line, CartesianGrid, XAxis, YAxis, Legend, Label, LabelList  } from 'recharts';
+import { useState } from 'react';
 
-export default function Plot({data}){
-  //const data = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400},];
-  //each entry on the horizontal axis is a single object
-  // data.name = ['name1', 'name2']
+export default function Plot({collection}){
 
-  //need to dynamically provide <Line /> components based on the number of repos
+  const data = collection.chartData;
+  const repoNames = collection.repoNames;
+
+  const [dataKeys, setDataKeys] = useState([]);
+
+  const RepoList = () => {
+    //provides list of all repo names in the collection
+    //each name can be clicked to add or remove the repo from the plot
+    return (
+      <ul>
+        {repoNames.map((name) => <li key={name} onClick={() => setDataKeys([name])}>{name}</li>)}
+      </ul>
+    )
+  }
+
+
+  const Lines = () => {
+
+    const lines = dataKeys.map((name) => (
+      <Line key={name} type="monotone" dataKey={name} stroke="#8884d8" />
+    ))
+    return lines;
+  }
 
   return (
     <div className="flex justify-center">
-      <LineChart width={600} height={400} data={data}>
-        <Line type="monotone" dataKey="bluesky" stroke="#8884d8" />
-        <Line type="monotone" dataKey="tiled" stroke="#cf3227" />
-        <Line type="monotone" dataKey="hklpy" stroke="#465227" />
+      <LineChart width={800} height={400} data={data}>
+        {Lines()}
         <CartesianGrid stroke="#ccc" />
         <XAxis dataKey="week">
           <Label value="Weeks" offset={0} position="insideBottom" />
@@ -20,6 +38,12 @@ export default function Plot({data}){
         <YAxis />
         <Legend />
       </LineChart>
+      <RepoList />
     </div>
   );
 }
+
+/*
+<Line type="monotone" dataKey="bluesky" stroke="#8884d8" />
+<Line type="monotone" dataKey="tiled" stroke="#cf3227" />
+<Line type="monotone" dataKey="TiledClient_jl" stroke="#465227" /> */
